@@ -1,9 +1,10 @@
 // importing the scanner class and the inputmismatchexception class
-import java.util.Scanner;
+import java.util.*;
 import java.util.InputMismatchException;
+import java.util.Scanner;
 // declaring the class
-public class EventSeatingPlanner {
-// declaring constants max people and group sizes using fixed values
+public class EventSeatingPlanner2 {
+    // declaring constants max people and group sizes using fixed values
     private static final int MAX_PEOPLE = 56;
     private static final int[] GROUP_SIZES = {2, 3, 4, 5, 6};
     // main method
@@ -14,7 +15,7 @@ public class EventSeatingPlanner {
 
         while (true) {
             System.out.println("\nEvent Seating Planner");
-            System.out.println("1. Enter total number of people and their group details");
+            System.out.println("1. Enter total number of people and their group details/Plan the Event");
             System.out.println("2. Create seating plan");
             System.out.println("3. Exit");
             System.out.print("Enter a choice: ");
@@ -48,17 +49,18 @@ public class EventSeatingPlanner {
                         System.out.println("Error: Total attendees exceeds the maximum limit of " + MAX_PEOPLE);
                     }
                     break;
-                    // case 2 is used to create the seating plan
-                    // the program will display the number of tables of 6 and 8 needed for the event
+                // case 2 is used to create the seating plan
+                // the program will display the number of tables of 6 and 8 needed for the event
                 case 2:
                     planSeating(groupCounts);
                     break;
-                    // case 3 is used to exit the program
-                    // the program will display a message to the user that the program is exiting
+                // case 3 is used to exit the program
+                // the program will display a message to the user that the program is exiting
                 case 3:
                     System.out.println("Exiting program...");
+                    System.exit(0);
                     return;
-                    // default is used to display a message to the user that the selection is invalid
+                // default is used to display a message to the user that the selection is invalid
                 default:
                     System.out.println("Invalid selection. Please try again.");
             }
@@ -131,26 +133,63 @@ public class EventSeatingPlanner {
         // displaying the total number of groups and the total number of people attending the event
         System.out.println("\nTotal number of groups: " + totalGroups);
         System.out.println("Total number of people attending: " + totalPeople);
+
     }
     // method to create the seating plan
     public static void planSeating(int[] groupCounts) {
         int tablesOf6 = 0;
         int tablesOf8 = 0;
-        // using for loop to calculate the number of tables of 6 and 8 needed for the event
-        // by multiplying the number of groups by the group size
-        for (int i = 0; i < GROUP_SIZES.length; i++){
-            int totalPeoplePerGroup = GROUP_SIZES[i] * groupCounts[i];
-            while (totalPeoplePerGroup > 0){
-                if (totalPeoplePerGroup == 8){
-                    tablesOf8++;
-                    totalPeoplePerGroup -= 8;
-                } else if (totalPeoplePerGroup == 6){
-                    tablesOf6++;
-                    totalPeoplePerGroup -= 6;
-                } else {
-                    tablesOf6++;
-                    totalPeoplePerGroup = 0;
-                }
+
+          int[] totalPeoplePerGroup = new int[groupCounts.length];
+          for (int i = 0; i < groupCounts.length; i++) {
+              totalPeoplePerGroup[i] = groupCounts[i] * GROUP_SIZES[i];
+          }
+        // 1. Assign groups of size 8 to tables of 8
+        tablesOf8 += groupCounts[4];
+        totalPeoplePerGroup[4] -= groupCounts[4] * GROUP_SIZES[4];
+
+        // 2. Combine groups of size 4 for tables of 8
+        while (groupCounts[3] >= 2) {
+            tablesOf8++;
+            groupCounts[3] -= 2;
+        }
+
+        // 3. Combine groups of size 6 with groups of size 2
+        while (groupCounts[2] > 0 && groupCounts[0] > 0) {
+            tablesOf8++;
+            groupCounts[2]--;
+            groupCounts[0]--;
+        }
+
+        // 4. Combine groups of size 5 with groups of size 3
+        while (groupCounts[3] > 0 && groupCounts[1] > 0) {
+            tablesOf8++;
+            groupCounts[3]--;
+            groupCounts[1]--;
+        }
+
+        // 5. Assign remaining groups of size 6 to tables of 6
+        tablesOf6 += groupCounts[2];
+        groupCounts[2] = 0;
+
+        // 6. Combine groups of size 4 with groups of size 2 for tables of 6
+        while (groupCounts[3] > 0 && groupCounts[0] > 0) {
+            tablesOf6++;
+            groupCounts[3]--;
+            groupCounts[0]--;
+        }
+
+        // 7. Combine groups of size 3 for tables of 6
+        while (groupCounts[1] >= 2) {
+            tablesOf6++;
+            groupCounts[1] -= 2;
+        }
+
+        // 8. Allocate remaining groups to tables of 6
+        for (int i = 0; i < groupCounts.length; i++) {
+            while (groupCounts[i] > 0) {
+                tablesOf6++;
+                groupCounts[i]--;
             }
         }
 
@@ -158,4 +197,3 @@ public class EventSeatingPlanner {
         System.out.println("Tables of 8 needed: " + tablesOf8);
     }
 }
-// end of program
